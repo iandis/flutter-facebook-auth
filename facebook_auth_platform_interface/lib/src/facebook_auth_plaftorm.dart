@@ -6,6 +6,7 @@ import 'facebook_auth_implementation.dart';
 import 'facebook_permissions.dart';
 import 'login_behavior.dart';
 import 'login_result.dart';
+import 'user_data_result/facebook_user_data_result.dart';
 
 /// The interface that implementations of flutter_facebook_auth must implement.
 ///
@@ -68,7 +69,7 @@ abstract class FacebookAuthPlatform extends PlatformInterface {
   /// retrive the user information using the GraphAPI
   ///
   /// [fields] string of fields like birthday,email,hometown
-  Future<Map<String, dynamic>> getUserData({
+  Future<FacebookUserDataResult> getUserData({
     String fields = "name,email,picture.width(200)",
   });
 
