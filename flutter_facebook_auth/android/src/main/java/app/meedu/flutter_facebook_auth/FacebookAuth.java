@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.facebook.AccessToken;
 import com.facebook.AuthenticationToken;
 import com.facebook.CallbackManager;
+import com.facebook.FacebookRequestError;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.LoginStatusCallback;
@@ -160,15 +161,23 @@ public class FacebookAuth {
     GraphRequest request =
         GraphRequest.newMeRequest(
             AccessToken.getCurrentAccessToken(),
-            new GraphRequest.GraphJSONObjectCallback() {
-              @Override
-              public void onCompleted(JSONObject object, GraphResponse response) {
+            (JSONObject object, GraphResponse response) -> {
                 try {
-                  result.success(object.toString());
+                  final FacebookRequestError error = response.getError();
+                  if (error != null) {
+                    result.success(new HashMap<String, Object>() {{
+                        put("success", false);
+                        put("error", getErrorMap(error));
+                    }});
+                  } else {
+                    result.success(new HashMap<String, Object>() {{
+                      put("success", true);
+                      put("data", object.toString());
+                    }});
+                  }
                 } catch (Exception e) {
                   result.error("FAILED", e.getMessage(), null);
                 }
-              }
             });
     Bundle parameters = new Bundle();
     parameters.putString("fields", fields);
@@ -196,5 +205,13 @@ public class FacebookAuth {
       map.put("authenticationToken", authenticationToken.getToken());
     }
     return map;
+  }
+
+  private static HashMap<String, Object> getErrorMap(FacebookRequestError error) {
+    return new HashMap<String, Object>(){{
+      put("code", error.getErrorCode());
+      put("error_subcode", error.getSubErrorCode());
+      put("message", error.getErrorMessage());
+    }};
   }
 }
