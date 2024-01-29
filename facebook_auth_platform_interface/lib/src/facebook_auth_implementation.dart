@@ -7,6 +7,7 @@ import 'facebook_auth_plaftorm.dart';
 import 'login_result.dart';
 import 'access_token.dart';
 import 'login_behavior.dart';
+import 'user_data_result/facebook_user_data_result.dart';
 
 /// class to make calls to the facebook login SDK
 class FacebookAuthPlatformImplementation extends FacebookAuthPlatform {
@@ -78,15 +79,25 @@ class FacebookAuthPlatformImplementation extends FacebookAuthPlatform {
   ///
   /// [fields] string of fields like birthday,email,hometown
   @override
-  Future<Map<String, dynamic>> getUserData({
+  Future<FacebookUserDataResult> getUserData({
     String fields = "name,email,picture.width(200)",
   }) async {
     final result = await channel.invokeMethod("getUserData", {
       "fields": fields,
     });
-    return isAndroid
-        ? jsonDecode(result)
-        : Map<String, dynamic>.from(result); //null  or dynamic data
+    final json = Map<String, dynamic>.from(result); //null  or dynamic data
+    final isSuccess = json['success'] == true;
+    if (isSuccess) {
+      final data = json['data'];
+      return FacebookAccount.fromJson(
+        isAndroid ? jsonDecode(data) : Map<String, dynamic>.from(data),
+      );
+    } else {
+      final error = json['error'];
+      return error is Map
+          ? FacebookApiError.fromJson(Map<String, dynamic>.from(json['error']))
+          : FacebookApiError.unknown;
+    }
   }
 
   /// Sign Out from Facebook
