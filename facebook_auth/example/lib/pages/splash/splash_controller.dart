@@ -12,8 +12,8 @@ class SplashController extends ChangeNotifier {
   bool get fetching => _fetching;
   bool? get isLogged => _isLogged;
 
-  Map<String, dynamic>? _userData;
-  Map<String, dynamic>? get userData => _userData;
+  FacebookUserDataResult? _userData;
+  FacebookUserDataResult? get userData => _userData;
 
   SplashController(
       this._facebookAuth, this._appTrackingTransparencyPermission) {
@@ -35,7 +35,6 @@ class SplashController extends ChangeNotifier {
       );
 
       print(accessToken!.expires);
-      prettyPrint(_userData!);
     }
     notifyListeners();
   }
@@ -48,7 +47,6 @@ class SplashController extends ChangeNotifier {
     _isLogged = result.status == LoginStatus.success;
     if (_isLogged!) {
       _userData = await _facebookAuth.getUserData();
-      prettyPrint(_userData!);
     }
     _fetching = false;
     notifyListeners();

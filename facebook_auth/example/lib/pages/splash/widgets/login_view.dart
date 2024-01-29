@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_facebook_auth_example/pages/splash/splash_controller.dart';
 import 'package:flutter_facebook_auth_example/pages/splash/widgets/loading.dart';
 import 'package:flutter_facebook_auth_example/pages/splash/widgets/login_button.dart';
@@ -65,15 +66,15 @@ class LoginView extends StatelessWidget {
                             Image.asset(
                               'assets/social_media.png',
                             ),
-                          if (isLogged && controller.userData != null) ...[
+                          if (isLogged && controller.userData is FacebookAccount) ...[
                             ClipOval(
                               child: Image.network(
-                                controller.userData!['picture']['data']['url'],
+                                (controller.userData as FacebookAccount).picture!.url,
                                 width: 80,
                               ),
                             ),
                             Text(
-                              "Hi ${controller.userData!['name']}",
+                              "Hi ${(controller.userData as FacebookAccount).name}",
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 18,

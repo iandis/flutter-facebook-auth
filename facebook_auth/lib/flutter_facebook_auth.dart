@@ -6,6 +6,9 @@ export 'package:flutter_facebook_auth_platform_interface/flutter_facebook_auth_p
         AccessToken,
         LoginResult,
         FacebookPermissions,
+        FacebookUserDataResult,
+        FacebookAccount,
+        FacebookApiError,
         LoginBehavior,
         LoginStatus;
 
@@ -60,7 +63,7 @@ class FacebookAuth {
   ///```
   ///
   ///The above JSON could be change, it depends of your [fields] argument.
-  Future<Map<String, dynamic>> getUserData({
+  Future<FacebookUserDataResult> getUserData({
     String fields = "name,email,picture.width(200)",
   }) =>
       _authPlatform.getUserData(fields: fields);
