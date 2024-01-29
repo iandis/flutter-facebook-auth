@@ -5,6 +5,7 @@ import 'access_token.dart';
 import 'facebook_auth_implementation.dart';
 import 'login_behavior.dart';
 import 'login_result.dart';
+import 'user_data_result/facebook_user_data_result.dart';
 
 enum LoginTracking { limited, enabled }
 
@@ -71,7 +72,7 @@ abstract class FacebookAuthPlatform extends PlatformInterface {
   /// retrive the user information using the GraphAPI
   ///
   /// [fields] string of fields like birthday,email,hometown
-  Future<Map<String, dynamic>> getUserData({
+  Future<FacebookUserDataResult> getUserData({
     String fields = "name,email,picture.width(200)",
   });
 
