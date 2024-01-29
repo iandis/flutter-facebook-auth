@@ -150,13 +150,25 @@ class FacebookAuth: NSObject {
      retrive the user data from facebook, this could be fail if you are trying to get data without the user autorization permission
      */
     private func getUserData(fields: String, flutterResult: @escaping FlutterResult) {
-        let graphRequest = GraphRequest(graphPath: "me", parameters: ["fields": fields])
-        graphRequest.start { _, result, error in
-            if error != nil {
-                self.sendErrorToClient(result: flutterResult, errorCode: "FAILED", message: error!.localizedDescription)
+        GraphRequest(graphPath: "me", parameters: ["fields": fields]).start { _, result, error  in
+            if let result = result as? NSDictionary, error == nil {
+                flutterResult([
+                    "success": true,
+                    "data": result,
+                ])
             } else {
-                let resultDic = result as! NSDictionary
-                flutterResult(resultDic) // send the response to the client
+                if let error = error as? NSError, error.domain == NSURLErrorDomain || error.domain == FBSDKLoginErrorDomain {
+                    if error.domain == NSURLErrorDomain {
+                        self.sendErrorToClient(result: flutterResult, errorCode: "NETWORK_ERROR", message: error.localizedDescription)
+                    } else {
+                        flutterResult([
+                            "success": false,
+                            "error": FacebookAuth.getErrorMap(error: error),
+                        ])
+                    }
+                } else {
+                    self.sendErrorToClient(result: flutterResult, errorCode: "FAILED", message: error!.localizedDescription)
+                }
             }
         }
     }
@@ -239,5 +251,14 @@ class FacebookAuth: NSObject {
         
     private func isLimitedLogin() -> Bool {
         return UserDefaults.standard.bool(forKey: "facebook_limited_login")
+    }
+
+    private static func getErrorMap(error: NSError) -> [String : Any] {
+        let userInfo = error.userInfo
+        return [
+            "code": userInfo[GraphRequestErrorGraphErrorCodeKey] as? Int ?? -1,
+            "error_subcode": userInfo[GraphRequestErrorGraphErrorSubcodeKey] as? Int ?? -1,
+            "message": userInfo[ErrorDeveloperMessageKey] as? String ?? "",
+        ];
     }
 }
