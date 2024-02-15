@@ -99,6 +99,9 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
   @override
   Future<void> logOut() async {
     if (!_initialized) return;
+    // We need to check the authResponse object first before calling the logout
+    // method on web, otherwise this method will never complete.
+    if (authResponse == null) return;
     Completer<void> c = Completer();
     fb.logout(allowInterop(
       (_) {
