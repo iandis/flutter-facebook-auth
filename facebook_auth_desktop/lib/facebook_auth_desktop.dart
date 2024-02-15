@@ -225,10 +225,6 @@ class FacebookAuthDesktopPlugin extends FacebookAuthPlatform {
     _appId = appId;
     _version = version;
   }
-
-  @override
-  AuthResponse? get authResponse =>
-      throw UnimplementedError('Only available on Web');
 }
 
 /// Generates a cryptographically secure random nonce, to be included in a

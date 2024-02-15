@@ -1,5 +1,4 @@
 export 'src/access_token.dart';
-export 'src/auth_response.dart';
 export 'src/facebook_auth_implementation.dart';
 export 'src/facebook_auth_plaftorm.dart';
 export 'src/facebook_permissions.dart';
