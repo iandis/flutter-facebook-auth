@@ -30,9 +30,8 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
     fb.getLoginStatus(
       allowInterop(
         (jsResponse) {
-          this._handleResponse(jsResponse).then(
-                (result) => completer.complete(result),
-              );
+          final result = _handleResponse(jsResponse);
+          completer.complete(result);
         },
       ),
     );
@@ -99,6 +98,9 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
   @override
   Future<void> logOut() async {
     if (!_initialized) return;
+    // we need to check if the user is logged in before call the logout method
+    // otherwise this method will never complete.
+    if (await accessToken == null) return;
     Completer<void> c = Completer();
     fb.logout(allowInterop(
       (_) {
@@ -127,9 +129,8 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
     fb.login(
       allowInterop(
         (jsResponse) {
-          this._handleResponse(jsResponse).then(
-                (result) => completer.complete(result),
-              );
+          final result = _handleResponse(jsResponse);
+          completer.complete(result);
         },
       ),
       fb.LoginOptions(
@@ -262,7 +263,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
   ///   }
   /// }
   /// ```
-  Future<LoginResult> _handleResponse(dynamic _) async {
+  LoginResult _handleResponse(dynamic _) {
     try {
       final Map<String, dynamic> response = convert(_);
       _checkResponseError(response);
@@ -309,7 +310,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
         status: LoginStatus.failed,
         message: 'unknown error',
       );
-    } on PlatformException catch (e, s) {
+    } on PlatformException catch (e) {
       return LoginResult(
         status: LoginStatus.failed,
         message: e.message,
