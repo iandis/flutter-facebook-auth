@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart'
     show visibleForTesting, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter_facebook_auth_platform_interface/src/auth_response.dart';
 
 import 'facebook_auth_plaftorm.dart';
 import 'facebook_permissions.dart';
@@ -153,4 +154,8 @@ class FacebookAuthPlatformImplementation extends FacebookAuthPlatform {
       });
     }
   }
+
+  @override
+  AuthResponse? get authResponse =>
+      throw UnimplementedError('Only available on Web');
 }

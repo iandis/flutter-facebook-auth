@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'access_token.dart';
+import 'auth_response.dart';
 import 'facebook_auth_implementation.dart';
 import 'facebook_permissions.dart';
 import 'login_behavior.dart';
@@ -87,4 +88,7 @@ abstract class FacebookAuthPlatform extends PlatformInterface {
 
   /// get the permissions for the current access token
   Future<FacebookPermissions?> get permissions;
+
+  /// ONLY FOR Web: the current [AuthResponse] object if available, null otherwise
+  AuthResponse? get authResponse;
 }

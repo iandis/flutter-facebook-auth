@@ -20,6 +20,9 @@ external api(String request, FbCallback fn);
 @JS('logout')
 external logout(FbCallback fn);
 
+@JS('getAuthResponse')
+external AuthResponse? getAuthResponse();
+
 @JS()
 @anonymous
 class InitOptions {
@@ -46,4 +49,20 @@ class LoginOptions {
   external String get scope;
   // ignore: non_constant_identifier_names
   external bool get return_scopes;
+}
+
+@JS()
+@anonymous
+class AuthResponse {
+  external factory AuthResponse({
+    required String accessToken,
+    required String userID,
+    required String expiresIn,
+    required String signedRequest,
+  });
+
+  external String get accessToken;
+  external String get userID;
+  external String get expiresIn;
+  external String get signedRequest;
 }

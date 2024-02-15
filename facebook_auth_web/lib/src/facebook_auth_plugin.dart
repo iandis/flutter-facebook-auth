@@ -309,7 +309,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
         status: LoginStatus.failed,
         message: 'unknown error',
       );
-    } on PlatformException catch (e, s) {
+    } on PlatformException catch (e) {
       return LoginResult(
         status: LoginStatus.failed,
         message: e.message,
@@ -337,4 +337,16 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
 
   @override
   Future<bool> get isAutoLogAppEventsEnabled => Future.value(false);
+
+  @override
+  AuthResponse? get authResponse {
+    final authResponse = fb.getAuthResponse();
+    if (authResponse == null) return null;
+    return AuthResponse(
+      accessToken: authResponse.accessToken,
+      userID: authResponse.userID,
+      expiresIn: authResponse.expiresIn,
+      signedRequest: authResponse.signedRequest,
+    );
+  }
 }
