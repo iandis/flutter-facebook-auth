@@ -100,8 +100,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
     if (!_initialized) return;
     // we need to check if the user is logged in before call the logout method
     // otherwise this method will never complete.
-    final accessToken = await this.accessToken;
-    if (accessToken == null) return;
+    if (await accessToken == null) return;
     Completer<void> c = Completer();
     fb.logout(allowInterop(
       (_) {
