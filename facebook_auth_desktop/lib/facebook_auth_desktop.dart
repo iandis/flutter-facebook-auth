@@ -221,6 +221,7 @@ class FacebookAuthDesktopPlugin extends FacebookAuthPlatform {
     required bool cookie,
     required bool xfbml,
     required String version,
+    bool status = false,
   }) async {
     _appId = appId;
     _version = version;

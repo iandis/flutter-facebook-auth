@@ -28,11 +28,13 @@ class InitOptions {
     required String version,
     required bool cookie,
     required bool xfbml,
+    required bool status,
   });
   external String get appId;
   external String get version;
   external bool get cookie;
   external bool get xfbml;
+  external bool get status;
 }
 
 @JS()

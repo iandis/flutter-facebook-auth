@@ -115,6 +115,7 @@ class FacebookAuthPlatformImplementation extends FacebookAuthPlatform {
     required bool cookie,
     required bool xfbml,
     required String version,
+    bool status = false,
   }) async {}
 
   /// returns the granted and declined permissions

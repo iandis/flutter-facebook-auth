@@ -40,6 +40,7 @@ abstract class FacebookAuthPlatform extends PlatformInterface {
     required bool cookie,
     required bool xfbml,
     required String version,
+    bool status,
   });
 
   /// use this to know if the facebook sdk was initializated on Web

@@ -150,6 +150,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
     required bool cookie,
     required bool xfbml,
     required String version,
+    bool status = false,
   }) async {
     this._appId = appId;
 
@@ -166,6 +167,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
         version: version,
         cookie: cookie,
         xfbml: xfbml,
+        status: status,
       ),
     );
     _initialized = true;
