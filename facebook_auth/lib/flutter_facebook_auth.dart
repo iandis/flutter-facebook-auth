@@ -93,12 +93,14 @@ class FacebookAuth {
     required bool cookie,
     required bool xfbml,
     required String version,
+    bool status = false,
   }) {
     return _authPlatform.webAndDesktopInitialize(
       appId: appId,
       cookie: cookie,
       xfbml: xfbml,
       version: version,
+      status: status,
     );
   }
 
