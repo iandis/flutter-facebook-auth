@@ -5,29 +5,33 @@ homepage: https://github.com/darwin-morocho/flutter-facebook-auth
 publish_to: 'none'
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=2.0.0"
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=2.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_facebook_auth_platform_interface:
-    git: 
+    git:
       url: https://github.com/iandis/flutter-facebook-auth.git
       path: facebook_auth_platform_interface
+      ref: flutter-facebook-auth-6.0.4
+
   # flutter_facebook_auth_platform_interface:
   #   path: ../facebook_auth_platform_interface
   flutter_facebook_auth_web:
-    git: 
+    git:
       url: https://github.com/iandis/flutter-facebook-auth.git
       path: facebook_auth_web
+      ref: flutter-facebook-auth-6.0.4
+
   # flutter_facebook_auth_web:
   #   path: ../facebook_auth_web
 
   # facebook_auth_desktop: ^1.0.2
   # flutter_bloc: ^8.1.3
   # social_login_buttons: ^1.0.7
-    # path: ../facebook_auth_desktop
+  # path: ../facebook_auth_desktop
 
 dev_dependencies:
   flutter_test:
@@ -46,5 +50,3 @@ flutter:
         default_package: flutter_facebook_auth_web
       macos:
         default_package: facebook_auth_desktop
-
-
