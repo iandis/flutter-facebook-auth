@@ -62,7 +62,7 @@ class FacebookAuthDesktopPlugin extends FacebookAuthPlatform {
   }
 
   @override
-  Future<Map<String, dynamic>> getUserData({
+  Future<FacebookUserDataResult> getUserData({
     String fields = "name,email,picture.width(200)",
   }) async {
     final token = (await accessToken)?.tokenString;
@@ -73,13 +73,19 @@ class FacebookAuthDesktopPlugin extends FacebookAuthPlatform {
       ),
     );
 
-    if (response.statusCode == 200) {
-      return Map<String, dynamic>.from(
+    if (response.statusCode == 200 || response.statusCode == 400) {
+      final json = Map<String, dynamic>.from(
         jsonDecode(response.body),
       );
+      final isError = json['error'] != null;
+      if (isError) {
+        return FacebookApiError.fromJson(json['error']);
+      } else {
+        return FacebookAccount.fromJson(json);
+      }
     }
 
-    return {}; // coverage:ignore-line
+    return FacebookApiError.unknown;
   }
 
   @override
