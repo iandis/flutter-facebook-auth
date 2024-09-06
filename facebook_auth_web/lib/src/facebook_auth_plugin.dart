@@ -65,20 +65,29 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
   ///}
   ///```
   @override
-  Future<Map<String, dynamic>> getUserData({
+  Future<FacebookUserDataResult> getUserData({
     String fields = "name,email,picture.width(200)",
   }) async {
-    if (!_initialized) return {"error": "window.FB is undefined"};
-    Completer<Map<String, dynamic>> c = Completer();
+    if (!_initialized) {
+      return FacebookApiError(
+        code: -1,
+        subCode: -1,
+        message: 'window.FB is undefined',
+      );
+    }
+    final c = Completer<FacebookUserDataResult>();
     fb.api(
-        "/me?fields=$fields",
-        (JSAny _) {
-          c.complete(
-            Map<String, dynamic>.from(
-              convert(_),
-            ),
-          );
-        }.toJS);
+      "/me?fields=$fields",
+      (JSAny _) {
+        final json = Map<String, dynamic>.from(convert(_));
+        final isError = json['error'] != null;
+        if (isError) {
+          c.complete(FacebookApiError.fromJson(json['error']));
+        } else {
+          c.complete(FacebookAccount.fromJson(json));
+        }
+      }.toJS,
+    );
     return c.future;
   }
 
@@ -214,10 +223,8 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
           status: LoginStatus.success,
           accessToken: ClassicToken(
             applicationId: this._appId,
-            grantedPermissions:
-                null, // on web we don't have this data in the login response
-            declinedPermissions:
-                null, // on web we don't have this data in the login response
+            grantedPermissions: null, // on web we don't have this data in the login response
+            declinedPermissions: null, // on web we don't have this data in the login response
             userId: authResponse['userID'],
             expires: expires,
             tokenString: authResponse['accessToken'],
