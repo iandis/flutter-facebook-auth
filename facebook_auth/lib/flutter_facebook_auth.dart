@@ -8,6 +8,7 @@ export 'package:flutter_facebook_auth_platform_interface/flutter_facebook_auth_p
         FacebookPermissions,
         FacebookUserDataResult,
         FacebookAccount,
+        FacebookProfilePicture,
         FacebookApiError,
         LoginBehavior,
         LoginTracking,
