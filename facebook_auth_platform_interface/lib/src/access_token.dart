@@ -3,7 +3,7 @@ const minMillisecondsSinceEpoch = -8640000000000000;
 
 enum AccessTokenType { classic, limited }
 
-abstract class AccessToken {
+sealed class AccessToken {
   final String tokenString;
   final AccessTokenType type;
 
