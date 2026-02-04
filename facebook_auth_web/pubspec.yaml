@@ -17,7 +17,7 @@ dependencies:
     git:
       url: https://github.com/iandis/flutter-facebook-auth.git
       path: facebook_auth_platform_interface
-      ref: flutter-facebook-auth-7.1.2
+      ref: flutter-facebook-auth-7.1.4
   web: ^1.1.1
   # flutter_facebook_auth_platform_interface:
     # path: ../facebook_auth_platform_interface
