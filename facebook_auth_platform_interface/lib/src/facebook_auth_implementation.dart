@@ -25,11 +25,14 @@ class FacebookAuthPlatformImplementation extends FacebookAuthPlatform {
   ///
   /// [loginBehavior] (only Android) use this param to set the UI for the authentication,
   /// like webview, native app, or a dialog.
+  ///
+  /// [webAuthType] (only Web) use this param to set the type of authentication flow, like `rerequest`, `reauthenticate`, `reauthorize`. Use `rerequest` when re-requesting a [declined permission](https://developers.facebook.com/docs/facebook-login/web/permissions/#re-asking-declined-permissions).
   @override
   Future<LoginResult> login({
     List<String> permissions = const ['email', 'public_profile'],
     LoginBehavior loginBehavior = LoginBehavior.dialogOnly,
     LoginTracking loginTracking = LoginTracking.enabled,
+    String? webAuthType,
     String? nonce,
   }) async {
     try {

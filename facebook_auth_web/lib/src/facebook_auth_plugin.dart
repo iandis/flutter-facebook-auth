@@ -110,6 +110,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
     List<String> permissions = const ['email', 'public_profile'],
     LoginBehavior loginBehavior = LoginBehavior.dialogOnly,
     LoginTracking loginTracking = LoginTracking.enabled,
+    String? webAuthType,
     String? nonce,
   }) async {
     if (!_initialized) {
@@ -129,6 +130,7 @@ class FlutterFacebookAuthPlugin extends FacebookAuthPlatform {
       fb.LoginOptions(
         scope: scope,
         return_scopes: true,
+        auth_type: webAuthType,
       ),
     );
 

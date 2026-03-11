@@ -42,8 +42,14 @@ extension type LoginOptions._(JSObject _) implements JSObject {
     required String scope,
     // ignore: non_constant_identifier_names
     required bool return_scopes,
+
+    /// Optional key, supports 3 values: `rerequest`, `reauthenticate`, `reauthorize`. Use `rerequest` when re-requesting a [declined permission](https://developers.facebook.com/docs/facebook-login/web/permissions/#re-asking-declined-permissions).
+    String? auth_type,
   });
   external String get scope;
   // ignore: non_constant_identifier_names
   external bool get return_scopes;
+
+  /// Optional key, supports 3 values: `rerequest`, `reauthenticate`, `reauthorize`. Use `rerequest` when re-requesting a [declined permission](https://developers.facebook.com/docs/facebook-login/web/permissions/#re-asking-declined-permissions).
+  external String? get auth_type;
 }
