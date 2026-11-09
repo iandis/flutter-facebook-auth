@@ -59,22 +59,23 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final data = await _auth.getUserData();
-    if (data.isEmpty) {
-      await _logout();
-      return;
+    switch (data) {
+      case FacebookApiError():
+        log('getUserData failed: $data');
+        await _logout();
+      case FacebookAccount():
+        setState(() {
+          _state = LoginSuccessful(
+            User(
+              userId: data.id,
+              accessToken: accessToken,
+              name: data.name,
+              pictureProfile: data.picture?.url,
+              email: data.email,
+            ),
+          );
+        });
     }
-
-    setState(() {
-      _state = LoginSuccessful(
-        User(
-          userId: data['id'],
-          accessToken: accessToken,
-          name: data['name'],
-          pictureProfile: data['picture']?['data']?['url'],
-          email: data['email'],
-        ),
-      );
-    });
   }
 
   Future<void> _logout() async {

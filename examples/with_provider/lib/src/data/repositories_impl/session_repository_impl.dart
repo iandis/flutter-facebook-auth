@@ -16,12 +16,12 @@ class SessionRepositoryImpl implements SessionRepository {
     if (await _auth.accessToken != null) {
       final userData = await _auth.getUserData();
 
-      if (userData.isNotEmpty) {
+      if (userData is FacebookAccount) {
         final user = User(
-          userId: userData['id'],
-          name: userData['name'],
-          email: userData['email'],
-          profilePicture: userData['picture']?['data']?['url'],
+          userId: userData.id,
+          name: userData.name,
+          email: userData.email,
+          profilePicture: userData.picture?.url,
         );
         return user;
       }

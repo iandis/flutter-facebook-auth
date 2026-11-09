@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:facebook_auth_desktop/facebook_auth_desktop.dart';
+import 'package:flutter_facebook_auth_platform_interface/flutter_facebook_auth_platform_interface.dart';
 
 final plugin = FacebookAuthDesktopPlugin();
 
@@ -9,6 +10,18 @@ String prettyPrint(Map json) {
   JsonEncoder encoder = const JsonEncoder.withIndent('  ');
   String pretty = encoder.convert(json);
   return pretty;
+}
+
+String describeUserData(FacebookUserDataResult userData) {
+  return switch (userData) {
+    FacebookAccount() => prettyPrint({
+        'id': userData.id,
+        'name': userData.name,
+        'email': userData.email,
+        'picture': userData.picture?.url,
+      }),
+    FacebookApiError() => 'Error ${userData.code} (${userData.subCode}): $userData',
+  };
 }
 
 void main() {
@@ -55,7 +68,7 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (_) => AlertDialog(
           content: Text(
-            prettyPrint(userData),
+            describeUserData(userData),
           ),
         ),
       );
