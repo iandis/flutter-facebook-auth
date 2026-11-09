@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth_platform_interface/flutter_facebook_auth_platform_interface.dart';
@@ -82,10 +80,10 @@ void main() {
             return null;
 
           case "getUserData":
-            final isAndroid = defaultTargetPlatform == TargetPlatform.android;
-            final result = isLogged ? MockData.userData : {};
-
-            return isAndroid ? jsonEncode(result) : result;
+            return MockData.userDataResult(
+              isLogged: isLogged,
+              isAndroid: defaultTargetPlatform == TargetPlatform.android,
+            );
 
           case "isAutoLogAppEventsEnabled":
             return isAutoLogAppEventsEnabled;
@@ -101,18 +99,26 @@ void main() {
 
     test('authenticated', () async {
       AccessToken? accessToken = await facebookAuth.accessToken;
-      Map<String, dynamic> userData = await facebookAuth.getUserData();
+      FacebookUserDataResult userData = await facebookAuth.getUserData();
       expect(accessToken, null);
-      expect(userData.length == 0, true);
-      final loginResult =
-          await facebookAuth.login(loginBehavior: LoginBehavior.webOnly);
+      expect(
+        userData,
+        isA<FacebookApiError>()
+            .having((it) => it.code, 'code', MockData.graphApiError['code'])
+            .having((it) => it.subCode, 'subCode', MockData.graphApiError['error_subcode'])
+            .having((it) => it.message, 'message', MockData.graphApiError['message']),
+      );
+      final loginResult = await facebookAuth.login(loginBehavior: LoginBehavior.webOnly);
       if (loginResult.status == LoginStatus.success) {
         accessToken = loginResult.accessToken;
         expect(accessToken, isNotNull);
         expect(await facebookAuth.accessToken, isA<AccessToken>());
         expect((await facebookAuth.expressLogin()), isA<LoginResult>());
         userData = await facebookAuth.getUserData();
-        expect(userData.containsKey("email"), true);
+        expect(
+          userData,
+          isA<FacebookAccount>().having((it) => it.email, 'email', MockData.userData['email']),
+        );
         await facebookAuth.logOut();
         expect(await facebookAuth.accessToken, null);
       }
@@ -228,6 +234,72 @@ void main() {
         'nonce': 'nonce-123',
       });
       expect(tokenFromTokenString.tokenString, 'abc-token-string');
+    });
+  });
+
+  group('getUserData', () {
+    const MethodChannel channel = MethodChannel(
+      'app.meedu/flutter_facebook_auth',
+    );
+    late FacebookAuthPlatform facebookAuth;
+
+    setUp(() {
+      facebookAuth = FacebookAuthPlatform.getInstance();
+    });
+
+    test('should parse the account and its picture from the JSON string Android sends', () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+          (MethodCall call) async {
+        if (call.method == 'getUserData') {
+          return MockData.userDataResult(isLogged: true, isAndroid: true);
+        }
+        return null;
+      });
+
+      final userData = await facebookAuth.getUserData();
+
+      expect(
+        userData,
+        isA<FacebookAccount>()
+            .having((it) => it.id, 'id', MockData.userData['id'])
+            .having((it) => it.name, 'name', MockData.userData['name'])
+            .having((it) => it.email, 'email', MockData.userData['email'])
+            .having((it) => it.picture?.width, 'picture.width', 200)
+            .having((it) => it.picture?.height, 'picture.height', 126),
+      );
+    });
+
+    test('should parse the account from the map iOS sends', () async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+          (MethodCall call) async {
+        if (call.method == 'getUserData') {
+          return MockData.userDataResult(isLogged: true, isAndroid: false);
+        }
+        return null;
+      });
+
+      final userData = await facebookAuth.getUserData();
+
+      expect(
+        userData,
+        isA<FacebookAccount>().having((it) => it.email, 'email', MockData.userData['email']),
+      );
+    });
+
+    test('should return an unknown FacebookApiError when the native error has no details', () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel,
+          (MethodCall call) async {
+        if (call.method == 'getUserData') return {"success": false};
+        return null;
+      });
+
+      final userData = await facebookAuth.getUserData();
+
+      expect(
+        userData,
+        isA<FacebookApiError>().having((it) => it.code, 'code', -1).having((it) => it.subCode, 'subCode', -1),
+      );
     });
   });
 }

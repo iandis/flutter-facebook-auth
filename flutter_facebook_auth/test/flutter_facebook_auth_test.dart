@@ -42,10 +42,11 @@ void main() {
               case "getUserData":
                 // final String fields = call.arguments['fields'];
                 final data = mockUserData;
-                if (defaultTargetPlatform == TargetPlatform.android) {
-                  return jsonEncode(data);
-                }
-                return data;
+                // The native side wraps the user data: a JSON string on Android, a map on iOS.
+                return {
+                  "success": true,
+                  "data": defaultTargetPlatform == TargetPlatform.android ? jsonEncode(data) : data,
+                };
               case "isAutoLogAppEventsEnabled":
                 return isAutoLogAppEventsEnabled;
 
@@ -74,8 +75,13 @@ void main() {
       expect(result.status, LoginStatus.success);
       expect(result.accessToken, isNotNull);
       expect(await facebookAuth.accessToken, isA<AccessToken>());
-      final Map<String, dynamic> userData = await facebookAuth.getUserData();
-      expect(userData.containsKey("email"), true);
+      final userData = await facebookAuth.getUserData();
+      expect(
+        userData,
+        isA<FacebookAccount>()
+            .having((it) => it.email, 'email', mockUserData['email'])
+            .having((it) => it.picture, 'picture', isA<FacebookProfilePicture>()),
+      );
       await facebookAuth.logOut();
       expect(await facebookAuth.accessToken, null);
     });
@@ -226,6 +232,57 @@ void main() {
         token.authenticationToken,
         mockAccessTokenWithAuthenticationToken['authenticationToken'],
       );
+    });
+
+    test('getUserData: returns FacebookApiError when the Graph API answers with an error', () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        channel,
+        (MethodCall call) async {
+          if (call.method == 'getUserData') {
+            return {
+              "success": false,
+              "error": {
+                "code": 190,
+                "error_subcode": 463,
+                "message": "Error validating access token: Session has expired.",
+              },
+            };
+          }
+          return null;
+        },
+      );
+
+      final userData = await facebookAuth.getUserData();
+      expect(
+        userData,
+        isA<FacebookApiError>()
+            .having((it) => it.code, 'code', 190)
+            .having((it) => it.subCode, 'subCode', 463)
+            .having((it) => it.message, 'message', 'Error validating access token: Session has expired.'),
+      );
+    });
+
+    test('login: does not send webAuthType to the native layer', () async {
+      MethodCall? captured;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        channel,
+        (MethodCall call) async {
+          if (call.method == 'login') {
+            captured = call;
+            return mockAccessToken;
+          }
+          return null;
+        },
+      );
+
+      final result = await facebookAuth.login(webAuthType: 'rerequest');
+
+      expect(result.status, LoginStatus.success);
+      final args = Map<String, dynamic>.from(captured!.arguments as Map);
+      expect(args.containsKey('webAuthType'), false);
+      expect(args.containsKey('auth_type'), false);
     });
   });
 }

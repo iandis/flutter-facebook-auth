@@ -1,4 +1,5 @@
 // import 'package:dio/dio.dart';
+import 'dart:convert';
 
 abstract class MockData {
   static const accessToken = {
@@ -44,6 +45,28 @@ abstract class MockData {
         }
       },
       "id": "136742241592917"
+    };
+  }
+
+  /// The Graph API error the native SDKs report when there is no access token.
+  static const graphApiError = {
+    "code": 104,
+    "error_subcode": -1,
+    "message": "An access token is required to request this resource.",
+  };
+
+  /// What the native `getUserData` call answers: the user data when logged in (a JSON string on Android, a map on
+  /// iOS), the Graph API error otherwise.
+  static Map<String, dynamic> userDataResult({
+    required bool isLogged,
+    required bool isAndroid,
+  }) {
+    if (!isLogged) {
+      return {"success": false, "error": graphApiError};
+    }
+    return {
+      "success": true,
+      "data": isAndroid ? jsonEncode(userData) : userData,
     };
   }
 }

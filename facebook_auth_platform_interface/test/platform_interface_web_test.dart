@@ -30,7 +30,7 @@ void main() {
             return null;
 
           case "getUserData":
-            return isLogged ? MockData.userData : {};
+            return MockData.userDataResult(isLogged: isLogged, isAndroid: false);
         }
       });
     });
@@ -38,15 +38,18 @@ void main() {
     test('login ok', () async {
       final instance = FacebookAuthPlatform.getInstance();
       AccessToken? accessToken = await FacebookAuthPlatform.instance.accessToken;
-      Map<String, dynamic> userData = await FacebookAuthPlatform.instance.getUserData();
+      FacebookUserDataResult userData = await FacebookAuthPlatform.instance.getUserData();
       expect(accessToken, null);
-      expect(userData.length == 0, true);
+      expect(userData, isA<FacebookApiError>());
       final loginResult = await instance.login();
       if (loginResult.status == LoginStatus.success) {
         accessToken = loginResult.accessToken;
         expect(accessToken, isNotNull);
         userData = await instance.getUserData();
-        expect(userData.containsKey("email"), true);
+        expect(
+          userData,
+          isA<FacebookAccount>().having((it) => it.email, 'email', MockData.userData['email']),
+        );
         await instance.logOut();
         expect(await instance.accessToken, null);
       }

@@ -117,8 +117,11 @@ void main() {
       expect(result.accessToken != null, true);
 
       // get the user data
-      Map<String, dynamic> userData = await plugin.getUserData();
-      expect(userData.containsKey('name'), true); // check the key name
+      final userData = await plugin.getUserData();
+      expect(
+        userData,
+        isA<FacebookAccount>().having((it) => it.name, 'name', MockData.userData['name']),
+      );
 
       // check the logout
       await plugin.logOut();

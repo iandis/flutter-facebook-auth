@@ -63,7 +63,7 @@ void main() {
       final result = await plugin.login();
       expect(result.accessToken, isNotNull);
       final userData = await plugin.getUserData();
-      expect(userData.isNotEmpty, true);
+      expect(userData, isA<FacebookAccount>().having((it) => it.id, 'id', '12345678'));
     },
   );
 
@@ -209,10 +209,34 @@ void main() {
       final accessToken = await plugin.accessToken;
       expect(accessToken, isNotNull);
       final userData = await plugin.getUserData();
-      expect(userData.isNotEmpty, true);
+      expect(userData, isA<FacebookAccount>().having((it) => it.id, 'id', '12345678'));
       i++;
       await plugin.logOut();
       expect(await plugin.accessToken, isNull);
+    },
+  );
+
+  test(
+    'getUserData > Graph API error',
+    () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(secureStorageChannel,
+          (MethodCall call) async {
+        switch (call.method) {
+          case "read":
+            return jsonEncode(mockAccessToken);
+        }
+        return null;
+      });
+
+      final plugin = FacebookAuthDesktopPlugin(
+        httpClient: MockGraphApiErrorHttpClient(),
+      );
+
+      final userData = await plugin.getUserData();
+      expect(
+        userData,
+        isA<FacebookApiError>().having((it) => it.code, 'code', 190).having((it) => it.subCode, 'subCode', 463),
+      );
     },
   );
 
@@ -252,6 +276,24 @@ class MockHttpClient implements CustomHttpClient {
     return Response.bytes(
       response.codeUnits,
       200,
+    );
+  }
+}
+
+class MockGraphApiErrorHttpClient implements CustomHttpClient {
+  @override
+  Future<Response> get(Uri url) async {
+    final response = jsonEncode({
+      'error': {
+        'code': 190,
+        'error_subcode': 463,
+        'message': 'Error validating access token: Session has expired.',
+      },
+    });
+
+    return Response.bytes(
+      response.codeUnits,
+      400,
     );
   }
 }
