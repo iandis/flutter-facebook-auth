@@ -2,6 +2,8 @@ name: flutter_facebook_auth_web
 description: web support for flutter_facebook_auth
 version: 6.1.2
 homepage: https://github.com/darwin-morocho/flutter-facebook-auth/tree/master/facebook_auth_web
+# This fork depends on its own packages through git, so it can't be published to pub.dev.
+publish_to: none
 
 
 environment:
